@@ -111,7 +111,7 @@ export function createImportRouter(config: AppConfig): Router {
       return;
     }
 
-    const csv = recordsToCSV(CRM_FIELDS, successful);
+    const csv = recordsToCSV([...CRM_FIELDS], successful);
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader(
