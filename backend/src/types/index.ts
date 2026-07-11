@@ -1,8 +1,10 @@
 // ─── Raw CSV ───────
 
-export interface RawRecord {
-  [key: string]: string;
-}
+export type RawRecord = Record<string, string>;
+
+export type IndexedRecord = RawRecord & {
+  _idx: number;
+};
 
 // ─── CRM Schema ──────
 
@@ -66,7 +68,7 @@ export interface BatchResult {
 
 export interface BatchInput {
   batchIndex: number;
-  records: Array<{ _idx: number } & RawRecord>;
+  records: IndexedRecord[];
 }
 
 // ─── API Response ────────

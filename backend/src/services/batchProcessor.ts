@@ -1,5 +1,6 @@
 import type {
   RawRecord,
+  IndexedRecord,
   CRMRecord,
   SkippedRecord,
   ImportResult,
@@ -42,28 +43,20 @@ export class BatchProcessor {
     let allSkipped: SkippedRecord[] = [];
     let completed = 0;
 
-    for (
-      let start = 0;
-      start < totalBatches;
-      start += this.maxConcurrent
-    ) {
-      const current = batches.slice(
-        start,
-        start + this.maxConcurrent,
-      );
+    for (let start = 0; start < totalBatches; start += this.maxConcurrent) {
+      const current = batches.slice(start, start + this.maxConcurrent);
 
       const results = await Promise.all(
         current.map(async (batch, index) => {
           const batchIndex = start + index;
 
-          const indexedBatch = batch.map((rec, j) => ({
-            _idx: batchIndex * this.batchSize + j,
+          const indexedBatch: IndexedRecord[] = batch.map((rec, j) => ({
             ...rec,
+            _idx: batchIndex * this.batchSize + j,
           }));
 
           try {
-            const result =
-              await this.extractor.extractBatch(indexedBatch);
+            const result = await this.extractor.extractBatch(indexedBatch);
 
             return {
               batchIndex,
@@ -72,25 +65,19 @@ export class BatchProcessor {
               count: batch.length,
             };
           } catch (err) {
-            const reason =
-              err instanceof Error ? err.message : "Batch failed";
+            const reason = err instanceof Error ? err.message : "Batch failed";
 
-            console.error(
-              `[Batch ${batchIndex + 1}] Failed:`,
-              reason,
-            );
+            console.error(`[Batch ${batchIndex + 1}] Failed:`, reason);
 
-            const skipped: SkippedRecord[] = indexedBatch.map(
-              (rec) => {
-                const { _idx, ...raw } = rec;
+            const skipped: SkippedRecord[] = indexedBatch.map((rec) => {
+              const { _idx, ...raw } = rec;
 
-                return {
-                  original_index: _idx,
-                  reason,
-                  raw_data: raw as RawRecord,
-                };
-              },
-            );
+              return {
+                original_index: _idx,
+                reason,
+                raw_data: raw as RawRecord,
+              };
+            });
 
             return {
               batchIndex,

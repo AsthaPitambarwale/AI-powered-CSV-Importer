@@ -3,12 +3,11 @@ import type {
   RawRecord,
   CRMRecord,
   SkippedRecord,
+  IndexedRecord,
   BatchResult,
   AppConfig,
   CRMStatus,
   DataSource,
-  ALLOWED_CRM_STATUSES,
-  ALLOWED_DATA_SOURCES,
 } from "../types/index.js";
 import {
   ALLOWED_CRM_STATUSES as STATUS_VALUES,
@@ -116,9 +115,7 @@ export class AIExtractor {
     this.maxRetries = config.maxRetries;
   }
 
-  async extractBatch(
-    records: Array<{ _idx: number } & RawRecord>,
-  ): Promise<BatchResult> {
+  async extractBatch(records: IndexedRecord[]): Promise<BatchResult> {
     const prompt = this.buildUserPrompt(records);
 
     const rawResponse = await withRetry(() => this.callAI(prompt), {
@@ -166,7 +163,7 @@ REMINDER:
         },
       ],
       temperature: 0,
-      max_tokens: 2000
+      max_tokens: 2000,
     });
 
     console.log(response);
