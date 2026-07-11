@@ -132,9 +132,7 @@ export class AIExtractor {
     return this.parseResponse(rawResponse, records);
   }
 
-  private buildUserPrompt(
-    records: Array<{ _idx: number } & RawRecord>,
-  ): string {
+  private buildUserPrompt(records: IndexedRecord[]): string {
     return `Extract GrowEasy CRM fields from these ${records.length} CSV records.
 
 INPUT RECORDS:
@@ -173,7 +171,7 @@ REMINDER:
 
   private parseResponse(
     rawText: string,
-    originalRecords: Array<{ _idx: number } & RawRecord>,
+    originalRecords: IndexedRecord[],
   ): BatchResult {
     // Extract JSON from response (handle markdown code blocks if present)
     let jsonText = rawText;
@@ -246,7 +244,7 @@ REMINDER:
     };
   }
 
-  private stripIdx(record: Record<string, string | number>): RawRecord {
+  private stripIdx(record: IndexedRecord): RawRecord {
     const { _idx, ...rest } = record;
     return rest as RawRecord;
   }
