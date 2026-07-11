@@ -2,9 +2,10 @@
 
 export type RawRecord = Record<string, string>;
 
-export type IndexedRecord = RawRecord & {
+export interface IndexedRecord {
   _idx: number;
-};
+  [key: string]: string | number;
+}
 
 // ─── CRM Schema ──────
 
